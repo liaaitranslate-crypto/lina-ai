@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lina AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Tahoma, sans-serif;
+    }
+
+    body {
+      background: #f7f8fc;
+      color: #202124;
+      min-height: 100vh;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #ffffff;
+      border-left: 1px solid #e8e8ef;
+      padding: 25px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      padding: 0 10px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6c63ff, #8b7cff);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(108, 99, 255, 0.25);
+    }
+
+    .logo-text {
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu-item {
+      padding: 14px 15px;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #666;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+      background: #f0efff;
+      color: #635bff;
+    }
+
+    .bottom {
+      margin-top: auto;
+      color: #999;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 45px 6%;
+      overflow-y: auto;
+    }
+
+    .welcome {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .welcome h1 {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .welcome h1 span {
+      color: #6c63ff;
+    }
+
+    .welcome p {
+      color: #777;
+      font-size: 17px;
+      margin-bottom: 35px;
+    }
+
+    /* Chat box */
+    .chat-box {
+      background: white;
+      border: 1px solid #e8e8ef;
+      border-radius: 22px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 10px 35px rgba(30, 30, 60, 0.06);
+      margin-bottom: 40px;
+    }
+
+    .chat-box textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 15px;
+      height: 55px;
+      font-size: 15px;
+      color: #333;
+      background: transparent;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 16px;
+      background: #6c63ff;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      transition: 0.2s;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.05);
+      background: #584fff;
+    }
+
+    /* Tools */
+    .tools-title {
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .tool {
+      background: white;
+      border: 1px solid #e8e8ef;
+      border-radius: 20px;
+      padding: 22px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tool:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(30, 30, 60, 0.08);
+    }
+
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: #f0efff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      margin-bottom: 15px;
+    }
+
+    .tool h3 {
+      font-size: 16px;
+      margin-bottom: 7px;
+    }
+
+    .tool p {
+      color: #888;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 190px;
+      }
+
+      .tools {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 15px;
+      }
+
+      .logo {
+        margin-bottom: 15px;
+      }
+
+      .menu {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .bottom {
+        display: none;
+      }
+
+      .main {
+        padding: 30px 18px;
+      }
+
+      .welcome h1 {
+        font-size: 30px;
+      }
+
+      .tools {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <div class="logo-icon">L</div>
+      <div class="logo-text">Lina</div>
+    </div>
+
+    <div class="menu">
+      <div class="menu-item active">⌂ &nbsp; خانه</div>
+      <div class="menu-item">💬 &nbsp; چت با لینا</div>
+      <div class="menu-item">🛠️ &nbsp; ابزارها</div>
+      <div class="menu-item">👤 &nbsp; پروفایل</div>
+    </div>
+
+    <div class="bottom">
+      Lina AI · Version 1.0
+    </div>
+
+  </aside>
+
+
+  <main class="main">
+
+    <section class="welcome">
+
+      <h1>
+        سلام، من <span>Lina</span> هستم ✨
+      </h1>
+
+      <p>
+        دستیار هوش مصنوعی تو برای چت، ترجمه، خلاصه‌سازی و کدنویسی.
+      </p>
+
+
+      <div class="chat-box">
+
+        <textarea
+          id="message"
+          placeholder="هر چیزی که می‌خواهی از لینا بپرس..."
+        ></textarea>
+
+        <button class="send-btn" onclick="sendMessage()">
+          ➤
+        </button>
+
+      </div>
+
+
+      <h2 class="tools-title">
+        ابزارهای لینا
+      </h2>
+
+
+      <div class="tools">
+
+        <div class="tool" onclick="alert('بخش چت لینا')">
+          <div class="tool-icon">💬</div>
+          <h3>چت با لینا</h3>
+          <p>
+            با دستیار هوشمند لینا گفتگو کن.
+          </p>
+        </div>
+
+
+        <div class="tool" onclick="alert('بخش ترجمه لینا')">
+          <div class="tool-icon">🌐</div>
+          <h3>ترجمه</h3>
+          <p>
+            متن‌های خود را به زبان‌های مختلف ترجمه کن.
+          </p>
+        </div>
+
+
+        <div class="tool" onclick="alert('بخش خلاصه‌سازی لینا')">
+          <div class="tool-icon">📝</div>
+          <h3>خلاصه‌سازی</h3>
+          <p>
+            متن‌های طولانی را سریع‌تر بررسی کن.
+          </p>
+        </div>
+
+
+        <div class="tool" onclick="alert('بخش کدنویسی لینا')">
+          <div class="tool-icon">💻</div>
+          <h3>کدنویسی</h3>
+          <p>
+            برای کدنویسی از لینا کمک بگیر.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+async function sendMessage() {
+
+  const input = document.getElementById("message");
+  const message = input.value.trim();
+
+  if (!message) {
+    return;
+  }
+
+  input.value = "";
+
+  try {
+
+    const response = await fetch("/api/chat", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        message: message
+      })
+
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.reply) {
+
+      alert(data.reply);
+
+    } else {
+
+      alert(data.error || "خطایی رخ داد.");
+
+    }
+
+  } catch (error) {
+
+    alert("اتصال به لینا برقرار نشد.");
+
+    console.error(error);
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
