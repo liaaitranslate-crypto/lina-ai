@@ -1385,7 +1385,145 @@ app.get(
     });
   }
 );
+// ============================================================
+// PRIVATE ANALYTICS DASHBOARD
+// ============================================================
 
+app.get("/admin/analytics", (req, res) => {
+  const secret = process.env.LINA_ANALYTICS_SECRET;
+
+  if (!secret || req.query.key !== secret) {
+    return res.status(403).send("دسترسی غیرمجاز");
+  }
+
+  const analytics = readAnalytics();
+  const users = readUsers();
+
+  const totalVisitors =
+    Object.keys(analytics.visitors || {}).length;
+
+  const totalRegistrations =
+    users.length;
+
+  const today = getToday();
+
+  const todayVisits =
+    analytics.dailyVisits?.[today] || 0;
+
+  const todayRegistrations =
+    analytics.dailyRegistrations?.[today] || 0;
+
+  res.send(`<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lina Analytics</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f3ff;
+      color: #171522;
+      padding: 30px;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      color: #715cf7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow:
+        0 8px 30px rgba(0,0,0,.08);
+    }
+
+    .num {
+      font-size: 34px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .muted {
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <h1>📊 Lina Analytics</h1>
+
+    <p class="muted">
+      آمار کلی استفاده از Lina
+    </p>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="muted">
+          کل بازدیدکنندگان
+        </div>
+
+        <div class="num">
+          ${totalVisitors}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="muted">
+          کل ثبت‌نام‌ها
+        </div>
+
+        <div class="num">
+          ${totalRegistrations}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="muted">
+          بازدید امروز
+        </div>
+
+        <div class="num">
+          ${todayVisits}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="muted">
+          ثبت‌نام امروز
+        </div>
+
+        <div class="num">
+          ${todayRegistrations}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>`);
+});
 // ============================================================
 // 404 API
 // ============================================================
