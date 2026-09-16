@@ -33,7 +33,145 @@ app.use(
     limit: "25mb"
   })
 );
+// ============================================================
+// LINA ANALYTICS
+// ============================================================
 
+const ANALYTICS_DIR = path.join(__dirname, "data");
+const ANALYTICS_FILE = path.join(
+  ANALYTICS_DIR,
+  "analytics.json"
+);
+
+if (!fs.existsSync(ANALYTICS_DIR)) {
+  fs.mkdirSync(ANALYTICS_DIR, {
+    recursive: true
+  });
+}
+
+if (!fs.existsSync(ANALYTICS_FILE)) {
+  fs.writeFileSync(
+    ANALYTICS_FILE,
+    JSON.stringify({
+      visitors: {},
+      dailyVisits: {},
+      dailyRegistrations: {}
+    }, null, 2),
+    "utf8"
+  );
+}
+
+function readAnalytics() {
+  try {
+    return JSON.parse(
+      fs.readFileSync(
+        ANALYTICS_FILE,
+        "utf8"
+      )
+    );
+  } catch (error) {
+    return {
+      visitors: {},
+      dailyVisits: {},
+      dailyRegistrations: {}
+    };
+  }
+}
+
+function saveAnalytics(data) {
+  fs.writeFileSync(
+    ANALYTICS_FILE,
+    JSON.stringify(
+      data,
+      null,
+      2
+    ),
+    "utf8"
+  );
+}
+
+function isBot(req) {
+  const userAgent =
+    req.headers["user-agent"] || "";
+
+  return /bot|crawler|spider|slurp|facebookexternalhit|bingpreview|OAI-SearchBot|Google-InspectionTool/i.test(
+    userAgent
+  );
+}
+
+function getToday() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+}
+
+function getVisitorId(req) {
+  const cookie =
+    req.headers.cookie || "";
+
+  const match =
+    cookie.match(
+      /(?:^|;\s*)lina_visitor=([^;]+)/
+    );
+
+  if (match) {
+    return decodeURIComponent(
+      match[1]
+    );
+  }
+
+  return crypto.randomUUID();
+}
+
+app.use((req, res, next) => {
+  if (
+    req.path.startsWith("/api") ||
+    req.path.startsWith("/admin") ||
+    isBot(req) ||
+    req.method !== "GET"
+  ) {
+    return next();
+  }
+
+  const visitorId =
+    getVisitorId(req);
+
+  const analytics =
+    readAnalytics();
+
+  const today =
+    getToday();
+
+  if (!analytics.visitors) {
+    analytics.visitors = {};
+  }
+
+  if (!analytics.dailyVisits) {
+    analytics.dailyVisits = {};
+  }
+
+  if (!analytics.visitors[visitorId]) {
+    analytics.visitors[visitorId] = {
+      firstVisit: new Date().toISOString(),
+      lastVisit: new Date().toISOString()
+    };
+
+    analytics.dailyVisits[today] =
+      (analytics.dailyVisits[today] || 0) + 1;
+  } else {
+    analytics.visitors[visitorId].lastVisit =
+      new Date().toISOString();
+  }
+
+  saveAnalytics(analytics);
+
+  res.setHeader(
+    "Set-Cookie",
+    `lina_visitor=${encodeURIComponent(visitorId)}; Path=/; Max-Age=31536000; SameSite=Lax`
+  );
+
+  next();
+});
 // ============================================================
 // LINA FRONTEND
 // ============================================================
