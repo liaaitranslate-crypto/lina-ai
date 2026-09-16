@@ -1330,7 +1330,17 @@ app.post(
       users.push(user);
 
       saveUsers(users);
+const analytics = readAnalytics();
+const today = getToday();
 
+if (!analytics.dailyRegistrations) {
+  analytics.dailyRegistrations = {};
+}
+
+analytics.dailyRegistrations[today] =
+  (analytics.dailyRegistrations[today] || 0) + 1;
+
+saveAnalytics(analytics);
       return res.json({
         success: true,
         message:
